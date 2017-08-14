@@ -1,0 +1,236 @@
+#!/bin/bash
+
+set -e -o pipefail
+
+trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
+
+# Ensure that there is only one instance of bbs
+wm_name=bbs-lemonbar
+! xdo id -a "${wm_name}" >/dev/null \
+    || { echo "$(basename "$0") is already running. Exiting." >&2 ; exit 1; }
+
+# Change to this script's directory
+cd $(cd "$(dirname "$0")" && pwd)/
+
+# Ensure that the config file exists
+config_dir="${XDG_CONFIG_HOME-${HOME}/.config}/bbs"
+config_path="${config_dir}/bbs.env"
+mkdir -p "${config_dir}"
+[[ -f "${config_path}" ]] || touch "${config_path}"
+
+# Set default settings
+CENTER_TITLE=true
+# Default colors: https://github.com/baskerville/bspwm/blob/master/examples/panel/panel_colors
+COLOR_DEFAULT_FG='#a7a5a5'
+COLOR_DEFAULT_BG='#333232'
+COLOR_FREE_FG='#737171'
+COLOR_FREE_BG='#333232'
+COLOR_FOCUSED_FREE_FG='#000000'
+COLOR_FOCUSED_FREE_BG='#504e4e'
+COLOR_OCCUPIED_FG='#a7a5a5'
+COLOR_OCCUPIED_BG='#333232'
+COLOR_FOCUSED_OCCUPIED_FG='#d6d3d2'
+COLOR_FOCUSED_OCCUPIED_BG='#504e4e'
+COLOR_URGENT_FG='#f15d66'
+COLOR_URGENT_BG='#333232'
+COLOR_FOCUSED_URGENT_FG='#501d1f'
+COLOR_FOCUSED_URGENT_BG='#d5443e'
+COLOR_TITLE_FG='#a8a2c0'
+COLOR_TITLE_BG='#333232'
+COLOR_SYS_FG='#b1a57d'
+COLOR_SYS_BG='#333232'
+DATE_FORMAT='%a %H:%M'
+# Unicode shapes: https://en.wikipedia.org/wiki/Geometric_Shapes
+ICON_DESKTOP_FREE='□'
+ICON_DESKTOP_FOCUSED_FREE='□'
+ICON_DESKTOP_OCCUPIED='■'
+ICON_DESKTOP_FOCUSED_OCCUPIED='■'
+ICON_DESKTOP_URGENT='☼'
+ICON_DESKTOP_FOCUSED_URGENT='☼'
+ICON_BATTERY_PLUGGED_IN='' # http://fontawesome.io/icon/plug/
+ICON_BATTERY_DISCHARGING='' # http://fontawesome.io/icon/bolt/
+ICON_CLOCK='' # http://fontawesome.io/icon/clock-o/
+ICON_SENSORS='' # http://fontawesome.io/icon/heart/
+ICON_VOLUME_DOWN='' # http://fontawesome.io/icon/volume-down/
+ICON_VOLUME_UP='' # http://fontawesome.io/icon/volume-up/
+ICON_WIFI='' # http://fontawesome.io/icon/wifi/
+LEMONBAR_EXTRA_ARGS="-f FontAwesome-12 -f DejaVuSans-10 \
+    -a $(($(bspc query --desktops|wc -l)+5)) \
+    -g $(xrandr|grep '+0+0'|tr -d primary|awk '{print $3}'|cut -dx -f1)x28+0+0"
+SHOW_BATTERY=true
+SHOW_CLOCK=true
+SHOW_DESKTOP_SWITCHER=true
+SHOW_SENSORS=true
+SHOW_TITLE=true
+SHOW_VOLUME=true
+SHOW_WIFI=true
+
+# Set user-defined setting overrides
+# https://stackoverflow.com/a/30969768
+set -o allexport
+source "${config_path}"
+set +o allexport
+
+# These settings must be exported, because they're used by the bbs_battery script.
+export ICON_BATTERY_DISCHARGING ICON_BATTERY_PLUGGED_IN
+
+process_bspwm() {
+    # Example `bspc subscribe report` output: WmDP-1-1:O1:LT:TT:G:mDP-1-3:O2:o3:f4:LT:TT:G:MeDP-1:O5:LT:TT:G
+    # https://github.com/baskerville/bspwm/blob/master/doc/bspwm.1.asciidoc#report-format
+    local color_bg color_fg input item label name prefix
+    local wm=''
+    local IFS=':' # Split the input by a ':' character.
+    local input="${1}"
+    for item in ${input}; do
+        # Each item has the form <prefix><input> where <prefix> is the first character and <input> is the
+        # prefix-specific input. For the prefixes handled below, the <input> is always the "desktop name".
+        prefix="${item:0:1}"
+        name="${item:1}"
+        if [[ "${prefix}" != [fFoOuU] ]]; then
+            continue
+        fi
+        case "${prefix}" in
+            f)
+                # Free desktop
+                color_fg=${COLOR_FREE_FG}
+                color_bg=${COLOR_FREE_BG}
+                label="$([[ -n "${ICON_DESKTOP_FREE}" ]] \
+                    && echo "${ICON_DESKTOP_FREE}" || echo "${name}")"
+                ;;
+            F)
+                # Focused free desktop
+                color_fg=${COLOR_FOCUSED_FREE_FG}
+                color_bg=${COLOR_FOCUSED_FREE_BG}
+                label="$([[ -n "${ICON_DESKTOP_FOCUSED_FREE}" ]] \
+                    && echo "${ICON_DESKTOP_FOCUSED_FREE}" || echo "${name}")"
+                ;;
+            o)
+                # Occupied desktop
+                color_fg=${COLOR_OCCUPIED_FG}
+                color_bg=${COLOR_OCCUPIED_BG}
+                label="$([[ -n "${ICON_DESKTOP_OCCUPIED}" ]] \
+                    && echo "${ICON_DESKTOP_OCCUPIED}" || echo "${name}")"
+                ;;
+            O)
+                # Focused occupied desktop
+                color_fg=${COLOR_FOCUSED_OCCUPIED_FG}
+                color_bg=${COLOR_FOCUSED_OCCUPIED_BG}
+                label="$([[ -n "${ICON_DESKTOP_FOCUSED_OCCUPIED}" ]] \
+                    && echo "${ICON_DESKTOP_FOCUSED_OCCUPIED}" || echo "${name}")"
+                ;;
+            u)
+                # Urgent desktop
+                color_fg=${COLOR_URGENT_FG}
+                color_bg=${COLOR_URGENT_BG}
+                label="$([[ -n "${ICON_DESKTOP_URGENT}" ]] \
+                    && echo "${ICON_DESKTOP_URGENT}" || echo "${name}")"
+                ;;
+            U)
+                # Focused urgent desktop
+                color_fg=${COLOR_FOCUSED_URGENT_FG}
+                color_bg=${COLOR_FOCUSED_URGENT_BG}
+                label="$([[ -n "${ICON_DESKTOP_FOCUSED_URGENT}" ]] \
+                    && echo "${ICON_DESKTOP_FOCUSED_URGENT}" || echo "${name}")"
+                ;;
+        esac
+        wm="${wm}%{F${color_fg}}%{B${color_bg}}%{A:bspc desktop -f ${name}:} ${label} %{A}%{B-}%{F-}"
+    done
+    printf '%s' "${wm}"
+}
+
+process_fifo() {
+    local battery clock input line prefix sensors system title volume wifi wm
+    local volume_buttons="%{A:pavolume -v -5:}${ICON_VOLUME_DOWN}%{A} %{A:pavolume -v +5:}${ICON_VOLUME_UP}%{A}"
+    local title_formatter=$([[ "${CENTER_TITLE}" == true ]] && echo '%{c}' || echo ' ')
+
+    while read -r line ; do
+        # Each line has the form <prefix><input> where <prefix> is the first character and <input> is the
+		# prefix-specific input
+        prefix="${line:0:1}"
+        input="${line:1}"
+        if [[ "${prefix}" != [BCNSTVW] ]]; then
+            continue
+        fi
+        case "${prefix}" in
+            B)
+                battery=" ${input} "
+                ;;
+            C)
+                clock=" ${ICON_CLOCK} ${input} "
+                ;;
+            N)
+                wifi=" ${ICON_WIFI} ${input} "
+                ;;
+            S)
+                sensors=" ${ICON_SENSORS} ${input} "
+                ;;
+            T)
+                title=" ${input} "
+                ;;
+            V)
+                volume=" ${volume_buttons} %{A:pavolume -m toggle:}${input}%{A} "
+                ;;
+            W)
+                wm="$(process_bspwm "${input}")"
+                ;;
+        esac
+        printf '%s\n' "%{l}${wm}${title_formatter}%{F$COLOR_TITLE_FG}%{B$COLOR_TITLE_BG}${title}%{B-}%{F-}\
+            %{r}%{F$COLOR_SYS_FG}%{B$COLOR_SYS_BG}${volume}${battery}${sensors}${wifi}${clock}%{B-}%{F-}"
+    done
+}
+
+run_periodically() {
+    local command="${1}"
+    local prefix="${2}"
+    local sleep_seconds="${3}"
+    local output
+
+    while true; do
+        output="$(${command})"
+        if [[ $? -ne 0 ]]; then
+            break
+        fi
+        printf '%s\n' "${prefix}${output}" > "${fifo}" || break
+        sleep ${sleep_seconds}s
+    done
+}
+
+adjust_z_order_and_write_fifo() {
+    # Wait until after Lemonbar has rendered.
+    local i=0
+    while [[ "${i}" -lt 10 ]] && ! wid="$(xdo id -a "${wm_name}")"; do
+		let i=i+1
+        sleep 0.1
+    done
+
+    # Move the Lemonbar window above the root window.
+    [[ -n "${wid}" ]] \
+        && xdo above -t '$(xdo id -N Bspwm -n root | sort | head -n 1)' "${wid}" \
+        || echo "Could not change the Lemonbar window's z-order" >&2
+
+    # Start writing to the FIFO after Lemonbar has started reading from it.
+    [[ "${SHOW_BATTERY}" != true ]] || run_periodically bbs_battery B 30 &
+    [[ "${SHOW_CLOCK}" != true ]] || clock -sf "C${DATE_FORMAT}" > "${fifo}" &
+    [[ "${SHOW_DESKTOP_SWITCHER}" != true ]] || bspc subscribe report > "${fifo}" & # Outputs a "W" prefix
+    [[ "${SHOW_SENSORS}" != true ]] || run_periodically bbs_sensors S 30 &
+    [[ "${SHOW_TITLE}" != true ]] || xtitle -sf 'T%s\n' > "${fifo}" &
+    [[ "${SHOW_VOLUME}" != true ]] || pavolume -sf 'V%s' > "${fifo}" &
+    [[ "${SHOW_WIFI}" != true ]] || run_periodically bbs_wifi N 30 &
+}
+
+fifo=$(mktemp -u)
+mkfifo -m 600 "${fifo}"
+
+adjust_z_order_and_write_fifo &
+
+# Read from the fifo, then process each line and pipe the processed output to Lemonbar, then evaluate the output from
+# Lemonbar, where each line corresponds to a command that was bound to a button using Lemonbar's %{Abutton:command:}
+# formatting syntax:
+# https://github.com/LemonBoy/bar#formatting
+process_fifo < "${fifo}" \
+    | lemonbar \
+        -n ${wm_name} \
+        -F ${COLOR_DEFAULT_FG} \
+        -B ${COLOR_DEFAULT_BG} \
+        ${LEMONBAR_EXTRA_ARGS} \
+    | while read line; do eval "${line}"; done

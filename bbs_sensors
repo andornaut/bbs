@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -e -o pipefail
+
+# https://stackoverflow.com/a/24710581
+output="$(sensors|awk '/^Core /{++r; gsub(/[^[:digit:]]+/, "", $3); s+=$3} END{print s/(10*r)}' 2>/dev/null)"
+if [[ $? -ne 0 ]]; then
+    exit 1
+fi
+
+printf '%.f°C\n' "${output}"
