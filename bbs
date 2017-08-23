@@ -213,7 +213,7 @@ adjust_z_order_and_write_fifo() {
     [[ "${SHOW_CLOCK}" != true ]] || clock -sf "C${DATE_FORMAT}" > "${fifo}" &
     [[ "${SHOW_DESKTOP_SWITCHER}" != true ]] || bspc subscribe report > "${fifo}" & # Outputs a "W" prefix
     [[ "${SHOW_SENSORS}" != true ]] || run_periodically bbs_sensors S 30 &
-    [[ "${SHOW_TITLE}" != true ]] || xtitle -sf 'T%s\n' > "${fifo}" &
+    [[ "${SHOW_TITLE}" != true ]] || xtitle -sf 'T%s' > "${fifo}" &
     [[ "${SHOW_VOLUME}" != true ]] || pavolume -sf 'V%s' > "${fifo}" &
     [[ "${SHOW_WIFI}" != true ]] || run_periodically bbs_wifi N 30 &
 }
