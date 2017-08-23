@@ -56,7 +56,7 @@ ICON_VOLUME_UP='' # http://fontawesome.io/icon/volume-up/
 ICON_WIFI='' # http://fontawesome.io/icon/wifi/
 LEMONBAR_EXTRA_ARGS="-f FontAwesome-12 -f DejaVuSans-10 \
     -a $(($(bspc query --desktops|wc -l)+5)) \
-    -g $(xrandr|grep '+0+0'|tr -d primary|awk '{print $3}'|cut -dx -f1)x28+0+0"
+    -g $(xrandr|grep 'primary.*+0+0'|tr -d primary|awk '{print $3}'|cut -dx -f1)x28+0+0"
 SHOW_BATTERY=true
 SHOW_CLOCK=true
 SHOW_DESKTOP_SWITCHER=true
