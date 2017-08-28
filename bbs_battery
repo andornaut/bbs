@@ -13,4 +13,4 @@ else
     icon="${ICON_BATTERY_PLUGGED_IN}"
 fi
 
-printf '%s %0.0f\n' "${icon}" "$(echo "${output}"|awk -F, '{s+=$2}END{print "",s/NR}')"
+printf '%s%0.0f%%\n' "${icon}" "$(echo "${output}"|awk -F, '{s+=$2}END{print "",s/NR}')"

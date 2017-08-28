@@ -14,12 +14,12 @@ cd $(cd "$(dirname "$0")" && pwd)/
 
 # Ensure that the config file exists
 config_dir="${XDG_CONFIG_HOME-${HOME}/.config}/bbs"
-config_path="${config_dir}/bbs.env"
+config_path="${config_dir}/bbsrc"
 mkdir -p "${config_dir}"
 [[ -f "${config_path}" ]] || touch "${config_path}"
 
 # Set default settings
-CENTER_TITLE=true
+CENTER_TITLE=false
 # Default colors: https://github.com/baskerville/bspwm/blob/master/examples/panel/panel_colors
 COLOR_DEFAULT_FG='#a7a5a5'
 COLOR_DEFAULT_BG='#333232'
@@ -47,16 +47,18 @@ ICON_DESKTOP_OCCUPIED='■'
 ICON_DESKTOP_FOCUSED_OCCUPIED='■'
 ICON_DESKTOP_URGENT='☼'
 ICON_DESKTOP_FOCUSED_URGENT='☼'
-ICON_BATTERY_PLUGGED_IN='' # http://fontawesome.io/icon/plug/
-ICON_BATTERY_DISCHARGING='' # http://fontawesome.io/icon/bolt/
-ICON_CLOCK='' # http://fontawesome.io/icon/clock-o/
-ICON_SENSORS='' # http://fontawesome.io/icon/heart/
-ICON_VOLUME_DOWN='' # http://fontawesome.io/icon/volume-down/
-ICON_VOLUME_UP='' # http://fontawesome.io/icon/volume-up/
-ICON_WIFI='' # http://fontawesome.io/icon/wifi/
-LEMONBAR_EXTRA_ARGS="-f FontAwesome-12 -f DejaVuSans-10 \
+ICON_BATTERY_PLUGGED_IN='⚡'
+ICON_BATTERY_DISCHARGING='⚡'
+ICON_CLOCK=''
+ICON_SENSORS='☼'
+ICON_VOLUME='♫'
+ICON_VOLUME_DOWN='‒'
+ICON_VOLUME_UP='+'
+ICON_WIFI='Wifi'
+LEMONBAR_EXTRA_ARGS="\
+    -f -10 \
     -a $(($(bspc query --desktops|wc -l)+5)) \
-    -g $(xrandr|grep 'primary.*+0+0'|tr -d primary|awk '{print $3}'|cut -dx -f1)x28+0+0"
+    -g $(xrandr|grep '+0+0'|head -n1|tr -d primary|awk '{print $3}'|cut -dx -f1)x28+0+0"
 SHOW_BATTERY=true
 SHOW_CLOCK=true
 SHOW_DESKTOP_SWITCHER=true
@@ -140,7 +142,7 @@ process_bspwm() {
 
 process_fifo() {
     local battery clock input line prefix sensors system title volume wifi wm
-    local volume_buttons="%{A:pavolume -v -5:}${ICON_VOLUME_DOWN}%{A} %{A:pavolume -v +5:}${ICON_VOLUME_UP}%{A}"
+    local volume_buttons="${ICON_VOLUME}%{A:pavolume -v -5:}${ICON_VOLUME_DOWN}%{A}%{A:pavolume -v +5:}${ICON_VOLUME_UP}%{A}"
     local title_formatter=$([[ "${CENTER_TITLE}" == true ]] && echo '%{c}' || echo ' ')
 
     while read -r line ; do
@@ -156,19 +158,19 @@ process_fifo() {
                 battery=" ${input} "
                 ;;
             C)
-                clock=" ${ICON_CLOCK} ${input} "
+                clock=" ${ICON_CLOCK}${input} "
                 ;;
             N)
-                wifi=" ${ICON_WIFI} ${input} "
+                wifi=" ${ICON_WIFI}${input} "
                 ;;
             S)
-                sensors=" ${ICON_SENSORS} ${input} "
+                sensors=" ${ICON_SENSORS}${input} "
                 ;;
             T)
-                title=" ${input} "
+               title=" ${input} "
                 ;;
             V)
-                volume=" ${volume_buttons} %{A:pavolume -m toggle:}${input}%{A} "
+                volume=" ${volume_buttons}%{A:pavolume -m toggle:}${input}%{A} "
                 ;;
             W)
                 wm="$(process_bspwm "${input}")"
@@ -213,7 +215,7 @@ adjust_z_order_and_write_fifo() {
     [[ "${SHOW_CLOCK}" != true ]] || clock -sf "C${DATE_FORMAT}" > "${fifo}" &
     [[ "${SHOW_DESKTOP_SWITCHER}" != true ]] || bspc subscribe report > "${fifo}" & # Outputs a "W" prefix
     [[ "${SHOW_SENSORS}" != true ]] || run_periodically bbs_sensors S 30 &
-    [[ "${SHOW_TITLE}" != true ]] || xtitle -sf 'T%s' > "${fifo}" &
+    [[ "${SHOW_TITLE}" != true ]] || xtitle -sf 'T%s\n' > "${fifo}" &
     [[ "${SHOW_VOLUME}" != true ]] || pavolume -sf 'V%s' > "${fifo}" &
     [[ "${SHOW_WIFI}" != true ]] || run_periodically bbs_wifi N 30 &
 }
