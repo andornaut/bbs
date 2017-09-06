@@ -3,9 +3,7 @@
 set -e -o pipefail
 
 output="$(acpi --battery 2>&1)"
-# The ACPI /sys interface may return data even if there is no battery, so query using --proc as well
-unsupported_output="No support for device type"
-if [[ $? -ne 0 || "${output}" == "${unsupported_output}"* || "$(acpi --battery --proc 2>&1)" == "${unsupported_output}"* ]]; then
+if [[ $? -ne 0 || "${output}" == "No support for device type"* ]]; then
 	exit 1
 fi
 
