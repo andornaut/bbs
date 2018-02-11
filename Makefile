@@ -2,11 +2,9 @@ PREFIX    ?= /usr/local
 BINPREFIX ?= $(PREFIX)/bin
 TARGETS = $(wildcard bbs*)
 
-.PHONY: default all install
+.PHONY: all install uninstall
 
-all: default
-
-default:
+all:
 	@echo "Run sudo make install"
 
 install:
