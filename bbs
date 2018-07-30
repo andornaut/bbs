@@ -39,7 +39,7 @@ COLOR_TITLE_FG='#a8a2c0'
 COLOR_TITLE_BG='#333232'
 COLOR_SYS_FG='#b1a57d'
 COLOR_SYS_BG='#333232'
-DATE_FORMAT='%a %d %H:%M'
+DATE_FORMAT='%a %d. %H:%M'
 # Unicode shapes: https://en.wikipedia.org/wiki/Geometric_Shapes
 ICON_DESKTOP_FREE='□'
 ICON_DESKTOP_FOCUSED_FREE='□'
@@ -158,7 +158,7 @@ process_fifo() {
                 battery=" ${input} "
                 ;;
             C)
-                clock=" ${ICON_CLOCK}${input} "
+                clock=" ${ICON_CLOCK} ${input} "
                 ;;
             N)
                 wifi=" ${ICON_WIFI}${input} "
