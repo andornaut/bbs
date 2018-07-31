@@ -16,6 +16,9 @@ bbs &
 
 [bbs](./bbs) creates and sources a file at `~/.config/bbs/bbsrc`, which you can use to change the following settings.
 
+See [this example bbsrc file](https://github.com/andornaut/dotfiles/blob/master/%24HOME/.config/bbs/bbsrc)
+
+
 Name|Default Value
 ---|---
 CENTER_TITLE|false
@@ -60,8 +63,6 @@ SHOW_SENSORS|true
 SHOW_TITLE|true
 SHOW_VOLUME|true
 SHOW_WIFI|true
-
-[Example Configuration](https://github.com/andornaut/dotfiles/blob/master/.config/bbs/bbsrc)
 
 ## Dependencies
 
