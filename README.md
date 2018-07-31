@@ -52,7 +52,7 @@ ICON_VOLUME|♫
 ICON_VOLUME_DOWN|‒
 ICON_VOLUME_UP|+
 ICON_WIFI|☎
-LEMONBAR_EXTRA_ARGS|`-f -10 -a $(($(bspc query --desktops|wc -l)+5)) -g $(xrandr|grep '+0+0'|head -n1|tr -d primary|awk '{print $3}'|cut -dx -f1)x28+0+0`
+LEMONBAR_EXTRA_ARGS|-f -10 -a $(($(bspc query --desktops|wc -l)+5)) -g $(xrandr|grep '+0+0'|head -n1|tr -d primary|awk '{print $3}'|cut -dx -f1)x28+0+0
 SHOW_BATTERY|true
 SHOW_CLOCK|true
 SHOW_DESKTOP_SWITCHER|true
