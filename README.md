@@ -16,8 +16,7 @@ bbs &
 
 [bbs](./bbs) creates and sources a file at `~/.config/bbs/bbsrc`, which you can use to change the following settings.
 
-See [this example bbsrc file](https://github.com/andornaut/dotfiles/blob/master/%24HOME/.config/bbs/bbsrc)
-
+See [this example bbsrc file](https://github.com/andornaut/dotfiles/blob/master/%24HOME/.config/bbs/bbsrc).
 
 Name|Default Value
 ---|---
