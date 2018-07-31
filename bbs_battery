@@ -7,10 +7,21 @@ if [[ $? -ne 0 || "${output}" == "No support for device type"* ]]; then
 	exit 1
 fi
 
+percentage="$(echo "${output}"|awk -F, '{s+=$2}END{print "",s/NR}')"
+icon="${ICON_BATTERY_PLUGGED_IN}"
 if [[ "${output}" = *Discharging* ]]; then
     icon="${ICON_BATTERY_DISCHARGING}"
-else
-    icon="${ICON_BATTERY_PLUGGED_IN}"
+    if [[ "${percentage}" -lt 13 && -n "${ICON_BATTERY_DISCHARGING_0}" ]]; then
+        icon="${ICON_BATTERY_DISCHARGING_0}"
+    elif [[ "${percentage}" -lt 38 && -n "${ICON_BATTERY_DISCHARGING_25}" ]]; then
+        icon="${ICON_BATTERY_DISCHARGING_25}"
+    elif [[ "${percentage}" -lt 63 && -n "${ICON_BATTERY_DISCHARGING_50}" ]]; then
+        icon="${ICON_BATTERY_DISCHARGING_50}"
+    elif [[ "${percentage}" -lt 88 && -n "${ICON_BATTERY_DISCHARGING_75}" ]]; then
+        icon="${ICON_BATTERY_DISCHARGING_75}"
+    elif [[ -n "${ICON_BATTERY_DISCHARGING_100}" ]]; then
+        icon="${ICON_BATTERY_DISCHARGING_100}"
+    fi
 fi
 
-printf '%s%0.0f%%\n' "${icon}" "$(echo "${output}"|awk -F, '{s+=$2}END{print "",s/NR}')"
+printf '%s%0.0f%%\n' "${icon}" "${percentage}"
