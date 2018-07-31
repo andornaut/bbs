@@ -18,7 +18,7 @@ bbs &
 
 Name|Default Value
 ---|---
-CENTER_TITLE|true
+CENTER_TITLE|false
 COLOR_DEFAULT_FG|#a7a5a5
 COLOR_DEFAULT_BG|#333232
 COLOR_FREE_FG|#737171
@@ -37,21 +37,26 @@ COLOR_TITLE_FG|#a8a2c0
 COLOR_TITLE_BG|#333232
 COLOR_SYS_FG|#b1a57d
 COLOR_SYS_BG|#333232
-DATE_FORMAT|%a %H:%M
-ICON_DESKTOP_FREE|□ *(For all `ICON_DESKTOP_*` settings, set to empty string `""` to display the desktop name instead)*
+
+DATE_FORMAT|%a %d, %H:%M
+ICON_DESKTOP_FREE|□
 ICON_DESKTOP_FOCUSED_FREE|□
 ICON_DESKTOP_OCCUPIED|■
 ICON_DESKTOP_FOCUSED_OCCUPIED|■
 ICON_DESKTOP_URGENT|☼
 ICON_DESKTOP_FOCUSED_URGENT|☼
-ICON_BATTERY_DISCHARGING|[](http://fontawesome.io/icon/plug/)
-ICON_BATTERY_PLUGGED_IN|[](http://fontawesome.io/icon/bolt/)
-ICON_CLOCK|[](http://fontawesome.io/icon/clock-o/)
-ICON_SENSORS|[](http://fontawesome.io/icon/heart/)
-ICON_VOLUME_DOWN|[](http://fontawesome.io/icon/volume-down/)
-ICON_VOLUME_UP|[](http://fontawesome.io/icon/volume-up/)
-ICON_WIFI|[](http://fontawesome.io/icon/wifi/)
-LEMONBAR_EXTRA_ARGS|-f FontAwesome-12 -f DejaVuSans-10 -a $(($(bspc query --desktops\|wc -l)+5)) -g $(xrandr\|grep '+0+0'\|tr -d primary\|awk '{print $3}'\|cut -dx -f1)x28+0+0
+ICON_BATTERY_PLUGGED_IN|⚡
+ICON_BATTERY_DISCHARGING|⚡
+ICON_CLOCK|☀
+ICON_SENSORS|♥
+ICON_VOLUME|♫
+ICON_VOLUME_DOWN|‒
+ICON_VOLUME_UP|+
+ICON_WIFI|☎
+LEMONBAR_EXTRA_ARGS|
+    -f -10 \
+    -a $(($(bspc query --desktops|wc -l)+5)) \
+    -g $(xrandr|grep '+0+0'|head -n1|tr -d primary|awk '{print $3}'|cut -dx -f1)x28+0+0
 SHOW_BATTERY|true
 SHOW_CLOCK|true
 SHOW_DESKTOP_SWITCHER|true
