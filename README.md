@@ -14,7 +14,7 @@ bbs &
 
 ## Configuration
 
-[bbs](./bbs) creates and sources a file at `~/.config/bbs/bbs.env`, which you can use to change the following settings.
+[bbs](./bbs) creates and sources a file at `~/.config/bbs/bbsrc`, which you can use to change the following settings.
 
 Name|Default Value
 ---|---
@@ -61,7 +61,7 @@ SHOW_TITLE|true
 SHOW_VOLUME|true
 SHOW_WIFI|true
 
-[Example Configuration](https://github.com/andornaut/dotfiles/blob/master/.config/bbs/bbs.env)
+[Example Configuration](https://github.com/andornaut/dotfiles/blob/master/.config/bbs/bbsrc)
 
 ## Dependencies
 
@@ -79,9 +79,3 @@ SHOW_WIFI|true
 * [pavolume](https://github.com/andornaut/pavolume)
 * [sutils](https://github.com/baskerville/sutils)
 * [xtitle](https://github.com/baskerville/xtitle)
-
-## Credits
-
-Originally inspired by the
-[BSPWM example panel scripts](https://github.com/baskerville/bspwm/tree/master/examples/panel).
-This project is not affiliated with, or endorsed by, BSPWM.
