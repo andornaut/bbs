@@ -97,42 +97,42 @@ process_bspwm() {
                 color_fg=${COLOR_FREE_FG}
                 color_bg=${COLOR_FREE_BG}
                 label="$([[ -n "${ICON_DESKTOP_FREE}" ]] \
-                    && echo "${ICON_DESKTOP_FREE}" || echo "${name}")"
+                    && echo -n "${ICON_DESKTOP_FREE}" || echo -n "${name}")"
                 ;;
             F)
                 # Focused free desktop
                 color_fg=${COLOR_FOCUSED_FREE_FG}
                 color_bg=${COLOR_FOCUSED_FREE_BG}
                 label="$([[ -n "${ICON_DESKTOP_FOCUSED_FREE}" ]] \
-                    && echo "${ICON_DESKTOP_FOCUSED_FREE}" || echo "${name}")"
+                    && echo -n "${ICON_DESKTOP_FOCUSED_FREE}" || echo -n "${name}")"
                 ;;
             o)
                 # Occupied desktop
                 color_fg=${COLOR_OCCUPIED_FG}
                 color_bg=${COLOR_OCCUPIED_BG}
                 label="$([[ -n "${ICON_DESKTOP_OCCUPIED}" ]] \
-                    && echo "${ICON_DESKTOP_OCCUPIED}" || echo "${name}")"
+                    && echo -n "${ICON_DESKTOP_OCCUPIED}" || echo -n "${name}")"
                 ;;
             O)
                 # Focused occupied desktop
                 color_fg=${COLOR_FOCUSED_OCCUPIED_FG}
                 color_bg=${COLOR_FOCUSED_OCCUPIED_BG}
                 label="$([[ -n "${ICON_DESKTOP_FOCUSED_OCCUPIED}" ]] \
-                    && echo "${ICON_DESKTOP_FOCUSED_OCCUPIED}" || echo "${name}")"
+                    && echo -n "${ICON_DESKTOP_FOCUSED_OCCUPIED}" || echo -n "${name}")"
                 ;;
             u)
                 # Urgent desktop
                 color_fg=${COLOR_URGENT_FG}
                 color_bg=${COLOR_URGENT_BG}
                 label="$([[ -n "${ICON_DESKTOP_URGENT}" ]] \
-                    && echo "${ICON_DESKTOP_URGENT}" || echo "${name}")"
+                    && echo -n "${ICON_DESKTOP_URGENT}" || echo -n "${name}")"
                 ;;
             U)
                 # Focused urgent desktop
                 color_fg=${COLOR_FOCUSED_URGENT_FG}
                 color_bg=${COLOR_FOCUSED_URGENT_BG}
                 label="$([[ -n "${ICON_DESKTOP_FOCUSED_URGENT}" ]] \
-                    && echo "${ICON_DESKTOP_FOCUSED_URGENT}" || echo "${name}")"
+                    && echo -n "${ICON_DESKTOP_FOCUSED_URGENT}" || echo -n "${name}")"
                 ;;
         esac
         wm="${wm}%{F${color_fg}}%{B${color_bg}}%{A:bspc desktop -f ${name}:} ${label} %{A}%{B-}%{F-}"
@@ -143,7 +143,7 @@ process_bspwm() {
 process_fifo() {
     local battery clock input line prefix sensors system title volume wifi wm
     local volume_icons="${ICON_VOLUME}%{A:pavolume -v -5:}${ICON_VOLUME_DOWN}%{A}%{A:pavolume -v +5:}${ICON_VOLUME_UP}%{A}"
-    local title_formatter=$([[ "${CENTER_TITLE}" == true ]] && echo '%{c}' || echo ' ')
+    local title_formatter=$([[ "${CENTER_TITLE}" == true ]] && echo -n '%{c}' || echo -n ' ')
 
     while read -r line ; do
         # Each line has the form <prefix><input> where <prefix> is the first character and <input> is the

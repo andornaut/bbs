@@ -7,7 +7,7 @@ if [[ $? -ne 0 || "${output}" == "No support for device type"* ]]; then
 	exit 1
 fi
 
-percentage="$(echo "${output}"|awk -F, '{s+=$2}END{print "",s/NR}')"
+percentage="$(echo -n "${output}"|awk -F, '{s+=$2}END{print int(s)/NR}')"
 icon="${ICON_BATTERY_PLUGGED_IN}"
 if [[ "${output}" = *Discharging* ]]; then
     icon="${ICON_BATTERY_DISCHARGING}"
