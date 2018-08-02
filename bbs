@@ -158,7 +158,7 @@ process_fifo() {
                 clock=" ${ICON_CLOCK}${input} "
                 ;;
             N)
-                wifi=" ${ICON_WIFI}${input} "
+                wifi=" %{A:urxvt -e nmtui-connect:}${ICON_WIFI}${input}%{A} "
                 ;;
             S)
                 sensors=" ${ICON_SENSORS}${input} "
