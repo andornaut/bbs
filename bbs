@@ -4,7 +4,7 @@ set -e -o pipefail
 
 trap 'trap - TERM; kill 0' INT TERM QUIT EXIT
 
-# Ensure that there is only one instance of bbs
+# Ensure that there is only one instance of bbs.
 wm_name=bbs-lemonbar
 ! xdo id -a "${wm_name}" >/dev/null \
     || { echo "$(basename "$0") is already running. Exiting." >&2 ; exit 1; }
@@ -194,34 +194,18 @@ run_periodically() {
     done
 }
 
-adjust_z_order_and_write_fifo() {
-    # Wait until after Lemonbar has rendered.
-    local i=0
-    while [[ "${i}" -lt 10 ]] && ! wid="$(xdo id -a "${wm_name}")"; do
-		let i=i+1
-        sleep 0.05
-    done
-
-    # Move the Lemonbar window below the root window.
-    [[ -n "${wid}" ]] \
-        && xdo below -t "$(xdo id -N Bspwm -n root | sort | head -n 1)" "${wid}" \
-        || echo "Could not change the Lemonbar window's z-order" >&2
-
-    # Start writing to the FIFO after Lemonbar has started reading from it.
-    [[ "${SHOW_BATTERY}" != true ]] || run_periodically bbs_battery B 30 &
-    [[ "${SHOW_CLOCK}" != true ]] || clock -sf "C${DATE_FORMAT}" > "${fifo}" &
-    [[ "${SHOW_DESKTOP_SWITCHER}" != true ]] || bspc subscribe report > "${fifo}" & # Outputs a "W" prefix
-    [[ "${SHOW_SENSORS}" != true ]] || run_periodically bbs_sensors S 60 &
-    [[ "${SHOW_TITLE}" != true ]] || xtitle -sf 'T%s\n' > "${fifo}" &
-    [[ "${SHOW_VOLUME}" != true ]] || pavolume -sf 'V%s' > "${fifo}" &
-    [[ "${SHOW_WIFI}" != true ]] || run_periodically bbs_wifi N 30 &
-}
 
 fifo=$(mktemp -u)
 mkfifo -m 600 "${fifo}"
 
-adjust_z_order_and_write_fifo &
-
+[[ "${SHOW_BATTERY}" != true ]] || run_periodically bbs_battery B 30 &
+[[ "${SHOW_CLOCK}" != true ]] || clock -sf "C${DATE_FORMAT}" > "${fifo}" &
+[[ "${SHOW_DESKTOP_SWITCHER}" != true ]] || bspc subscribe report > "${fifo}" & # Outputs a "W" prefix
+[[ "${SHOW_SENSORS}" != true ]] || run_periodically bbs_sensors S 60 &
+[[ "${SHOW_TITLE}" != true ]] || xtitle -sf 'T%s\n' > "${fifo}" &
+[[ "${SHOW_VOLUME}" != true ]] || pavolume -sf 'V%s' > "${fifo}" &
+[[ "${SHOW_WIFI}" != true ]] || run_periodically bbs_wifi N 30 &
+    
 # Read from the fifo, then process each line and pipe the processed output to Lemonbar, then evaluate the output from
 # Lemonbar, where each line corresponds to a command that was bound to a button using Lemonbar's %{Abutton:command:}
 # formatting syntax:
