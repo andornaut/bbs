@@ -73,13 +73,10 @@ set -o allexport
 source "${config_path}"
 set +o allexport
 
-# These settings must be exported, because they're used by the bbs_battery script.
-export ICON_BATTERY_DISCHARGING ICON_BATTERY_PLUGGED_IN
-
 process_bspwm() {
     # Example `bspc subscribe report` output: WmDP-1-1:O1:LT:TT:G:mDP-1-3:O2:o3:f4:LT:TT:G:MeDP-1:O5:LT:TT:G
     # https://github.com/baskerville/bspwm/blob/master/doc/bspwm.1.asciidoc#report-format
-    local color_bg color_fg input item label name prefix
+    local color_bg color_fg item label name prefix
     local wm=''
     local IFS=':' # Split the input by a ':' character.
     local input="${1}"
@@ -94,43 +91,43 @@ process_bspwm() {
         case "${prefix}" in
             f)
                 # Free desktop
-                color_fg=${COLOR_FREE_FG}
                 color_bg=${COLOR_FREE_BG}
+                color_fg=${COLOR_FREE_FG}
                 label="$([[ -n "${ICON_DESKTOP_FREE}" ]] \
                     && echo -n "${ICON_DESKTOP_FREE}" || echo -n "${name}")"
                 ;;
             F)
                 # Focused free desktop
-                color_fg=${COLOR_FOCUSED_FREE_FG}
                 color_bg=${COLOR_FOCUSED_FREE_BG}
+                color_fg=${COLOR_FOCUSED_FREE_FG}
                 label="$([[ -n "${ICON_DESKTOP_FOCUSED_FREE}" ]] \
                     && echo -n "${ICON_DESKTOP_FOCUSED_FREE}" || echo -n "${name}")"
                 ;;
             o)
                 # Occupied desktop
-                color_fg=${COLOR_OCCUPIED_FG}
                 color_bg=${COLOR_OCCUPIED_BG}
+                color_fg=${COLOR_OCCUPIED_FG}
                 label="$([[ -n "${ICON_DESKTOP_OCCUPIED}" ]] \
                     && echo -n "${ICON_DESKTOP_OCCUPIED}" || echo -n "${name}")"
                 ;;
             O)
                 # Focused occupied desktop
-                color_fg=${COLOR_FOCUSED_OCCUPIED_FG}
                 color_bg=${COLOR_FOCUSED_OCCUPIED_BG}
+                color_fg=${COLOR_FOCUSED_OCCUPIED_FG}
                 label="$([[ -n "${ICON_DESKTOP_FOCUSED_OCCUPIED}" ]] \
                     && echo -n "${ICON_DESKTOP_FOCUSED_OCCUPIED}" || echo -n "${name}")"
                 ;;
             u)
                 # Urgent desktop
-                color_fg=${COLOR_URGENT_FG}
                 color_bg=${COLOR_URGENT_BG}
+                color_fg=${COLOR_URGENT_FG}
                 label="$([[ -n "${ICON_DESKTOP_URGENT}" ]] \
                     && echo -n "${ICON_DESKTOP_URGENT}" || echo -n "${name}")"
                 ;;
             U)
                 # Focused urgent desktop
-                color_fg=${COLOR_FOCUSED_URGENT_FG}
                 color_bg=${COLOR_FOCUSED_URGENT_BG}
+                color_fg=${COLOR_FOCUSED_URGENT_FG}
                 label="$([[ -n "${ICON_DESKTOP_FOCUSED_URGENT}" ]] \
                     && echo -n "${ICON_DESKTOP_FOCUSED_URGENT}" || echo -n "${name}")"
                 ;;
@@ -202,19 +199,19 @@ adjust_z_order_and_write_fifo() {
     local i=0
     while [[ "${i}" -lt 10 ]] && ! wid="$(xdo id -a "${wm_name}")"; do
 		let i=i+1
-        sleep 0.1
+        sleep 0.05
     done
 
-    # Move the Lemonbar window above the root window.
+    # Move the Lemonbar window below the root window.
     [[ -n "${wid}" ]] \
-        && xdo above -t '$(xdo id -N Bspwm -n root | sort | head -n 1)' "${wid}" \
+        && xdo below -t "$(xdo id -N Bspwm -n root | sort | head -n 1)" "${wid}" \
         || echo "Could not change the Lemonbar window's z-order" >&2
 
     # Start writing to the FIFO after Lemonbar has started reading from it.
     [[ "${SHOW_BATTERY}" != true ]] || run_periodically bbs_battery B 30 &
     [[ "${SHOW_CLOCK}" != true ]] || clock -sf "C${DATE_FORMAT}" > "${fifo}" &
     [[ "${SHOW_DESKTOP_SWITCHER}" != true ]] || bspc subscribe report > "${fifo}" & # Outputs a "W" prefix
-    [[ "${SHOW_SENSORS}" != true ]] || run_periodically bbs_sensors S 30 &
+    [[ "${SHOW_SENSORS}" != true ]] || run_periodically bbs_sensors S 60 &
     [[ "${SHOW_TITLE}" != true ]] || xtitle -sf 'T%s\n' > "${fifo}" &
     [[ "${SHOW_VOLUME}" != true ]] || pavolume -sf 'V%s' > "${fifo}" &
     [[ "${SHOW_WIFI}" != true ]] || run_periodically bbs_wifi N 30 &

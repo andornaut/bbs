@@ -4,7 +4,7 @@ set -e -o pipefail
 
 interface=$(iw dev|awk '{if ($1 == "Interface") { print $2 }}')
 
-if ! type "nmcli" >/dev/null 2>&1 || [[ -z "${interface}" ]]; then
+if ! type nmcli >/dev/null 2>&1 || [[ -z "${interface}" ]]; then
     exit 1
 fi
 
