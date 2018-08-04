@@ -3,13 +3,20 @@
 set -e -o pipefail
 
 output="$(acpi --battery|grep -v unavailable 2>&1)"
-if [[ $? -ne 0 || "${output}" == "No support for device type"* ]]; then
-	exit 1
+exit_code=$?
+
+if [[ $? -ne 0 ]]; then
+	exit ${exit_code}
+fi
+
+if [[ "${output}" == "No support for device type"* ]]; then
+    exit 1
 fi
 
 # Average of battery percentages, rounded to nearest integer
 percentage="$(echo -n "${output}"|awk -F, '{s+=$2}END{print int(s/NR + 0.5)}')"
 icon="${ICON_BATTERY_PLUGGED_IN}"
+
 if [[ "${output}" = *Discharging* ]]; then
     icon="${ICON_BATTERY_DISCHARGING}"
     if [[ "${percentage}" -lt 13 && -n "${ICON_BATTERY_DISCHARGING_0}" ]]; then
