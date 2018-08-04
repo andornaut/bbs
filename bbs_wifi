@@ -9,11 +9,6 @@ if ! type nmcli >/dev/null 2>&1 || [[ -z "${interface}" ]]; then
 fi
 
 output="$(nmcli d w|awk '{if ($1 == "*" && $2 != "SSID") {print $7}}')"
-exit_code=$?
-
-if [[ ${exit_code} -ne 0 ]]; then
-    exit ${exit_code}
-fi
 
 if [[ -z "${output}" ]]; then
     quality='---'

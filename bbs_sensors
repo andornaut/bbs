@@ -3,11 +3,5 @@
 set -e -o pipefail
 
 # https://stackoverflow.com/a/24710581
-output="$(sensors|awk '/^Core /{++r; gsub(/[^[:digit:]]+/, "", $3); s+=$3} END{print s/(10*r)}' 2>/dev/null)"
-exit_code=$?
-
-if [[ ${exit_code} -ne 0 ]]; then
-    exit ${exit_code}
-fi
-
+output="$(x|awk '/^Core /{++r; gsub(/[^[:digit:]]+/, "", $3); s+=$3} END{print s/(10*r)}' 2>/dev/null)"
 printf '%.f°C\n' "${output}"

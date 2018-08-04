@@ -3,11 +3,6 @@
 set -e -o pipefail
 
 output="$(acpi --battery|grep -v unavailable 2>&1)"
-exit_code=$?
-
-if [[ $? -ne 0 ]]; then
-	exit ${exit_code}
-fi
 
 if [[ "${output}" == "No support for device type"* ]]; then
     exit 1
