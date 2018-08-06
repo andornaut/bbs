@@ -27,4 +27,4 @@ if [[ "${output}" = *Discharging* ]]; then
     fi
 fi
 
-printf '%s%0.0f%%\n' "${icon}" "${percentage}"
+printf '%s%.f%%\n' "${icon}" "${percentage}"

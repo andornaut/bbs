@@ -3,5 +3,13 @@
 set -e -o pipefail
 
 # https://stackoverflow.com/a/24710581
-output="$(x|awk '/^Core /{++r; gsub(/[^[:digit:]]+/, "", $3); s+=$3} END{print s/(10*r)}' 2>/dev/null)"
+output="$(sensors)"
+if [[ "$output" =~ k10temp-pci ]]; then
+    # Ryzen workaround
+    # https://github.com/groeck/lm-sensors/issues/16
+    output="$(echo -n "${output}"|awk 'c&&!--c; /k10temp/{c=2}'|awk '{gsub(/[^[:digit:]\.]+/, "", $2); print int($2+0.5)}')"
+else
+    output="$(echo -n "${output}"|awk '/^Core /{++r; gsub(/[^[:digit:]\.]+/, "", $3); s+=$3} END{print int(s/r+0.5)}' 2>/dev/null)"
+fi
+
 printf '%.f°C\n' "${output}"
