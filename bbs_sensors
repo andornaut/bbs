@@ -1,4 +1,4 @@
-#!/bin/bash
+
 
 set -e -o pipefail
 
@@ -7,8 +7,11 @@ output="$(sensors)"
 if [[ "$output" =~ k10temp-pci ]]; then
     # Ryzen workaround
     # https://github.com/groeck/lm-sensors/issues/16
-    output="$(echo -n "${output}"|awk 'c&&!--c; /k10temp/{c=2}'|awk '{gsub(/[^[:digit:]\.]+/, "", $2); print int($2+0.5)}')"
+    # Read k10temp-pci-00c3 \ Tctl: +33.6°C
+    # Tested on kernel v5.8.0-40, sensors v3.6.0, libsensors v3.6.0
+    output="$(echo -n "${output}"|awk 'c&&!--c; /k10temp/{c=4}'|awk '{gsub(/[^[:digit:]\.]+/, "", $2); print int($2+0.5)}')"
 else
+    # Average core temperatures
     output="$(echo -n "${output}"|awk '/^Core /{++r; gsub(/[^[:digit:]\.]+/, "", $3); s+=$3} END{print int(s/r+0.5)}' 2>/dev/null)"
 fi
 
