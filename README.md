@@ -1,6 +1,8 @@
 # BBS - BSPWM Bar Scripts
 
-Scripts to render a Linux desktop bar (top panel). Intended to be used with [lemonbar](https://github.com/LemonBoy/bar)
+Scripts to render a Linux desktop bar (top panel). 
+
+Designed to be used with [lemonbar](https://github.com/LemonBoy/bar)
 and [BSWPM](https://github.com/baskerville/bspwm).
 
 ![Screenshot](https://raw.githubusercontent.com/andornaut/bbs/master/screenshot.png)
@@ -70,7 +72,7 @@ SHOW_WIFI|true
 
 ## Dependencies
 
-*An asterisk denotes a required dependency*
+*An asterisk denotes a required dependency.*
 
 * [BSWPM](https://github.com/baskerville/bspwm)\*
 * [lemonbar](https://github.com/LemonBoy/bar)\*

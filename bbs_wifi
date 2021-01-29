@@ -8,7 +8,7 @@ if ! type nmcli >/dev/null 2>&1 || [[ -z "${interface}" ]]; then
     exit 1
 fi
 
-output="$(nmcli d w|awk '{if ($1 == "*" && $2 != "SSID") {print $7}}')"
+output="$(nmcli d w|awk '{if ($1 == "*" && $2 != "SSID") {print $8}}')"
 
 if [[ -z "${output}" ]]; then
     quality='---'
