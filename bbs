@@ -41,11 +41,11 @@ COLOR_TITLE_BG=${COLOR_DEFAULT_BG}
 COLOR_TITLE_FG=${COLOR_DEFAULT_FG}
 DATE_FORMAT='%a %d, %H:%M'
 # Unicode shapes: https://en.wikipedia.org/wiki/Geometric_Shapes
-ICON_DESKTOP_FREE='□'
-ICON_DESKTOP_OCCUPIED='■'
+ICON_DESKTOP_FREE='◻︎'
+ICON_DESKTOP_OCCUPIED='◼️'
 ICON_DESKTOP_URGENT='☼'
-ICON_DESKTOP_FOCUSED_FREE='□'
-ICON_DESKTOP_FOCUSED_OCCUPIED='■'
+ICON_DESKTOP_FOCUSED_FREE='◻︎'
+ICON_DESKTOP_FOCUSED_OCCUPIED='◼️'
 ICON_DESKTOP_FOCUSED_URGENT='☼'
 ICON_BATTERY_DISCHARGING='⚡ '
 ICON_BATTERY_PLUGGED_IN='⚡ '
@@ -72,6 +72,7 @@ SHOW_WIFI=true
 set -o allexport
 source "${config_path}"
 set +o allexport
+echo $ICON_DESKTOP_FREE
 
 process_bspwm() {
     # Example `bspc subscribe report` output: WmDP-1-1:O1:LT:TT:G:mDP-1-3:O2:o3:f4:LT:TT:G:MeDP-1:O5:LT:TT:G
